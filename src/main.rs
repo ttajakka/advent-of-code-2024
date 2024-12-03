@@ -1,4 +1,4 @@
-use advent_of_code_2024::{day1::day1, day2::day2};
+use advent_of_code_2024::{day1::day1, day2::day2, day3::day3};
 
 fn main() {
     println!("Advent of code, 2024");
@@ -8,4 +8,6 @@ fn main() {
     day1();
     println!("");
     day2();
+    println!("");
+    day3();
 }

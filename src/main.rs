@@ -15,4 +15,5 @@ fn main() {
     day3();
     println!("");
     day4::puzzle1();
+    day4::puzzle2();
 }

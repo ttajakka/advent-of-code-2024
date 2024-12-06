@@ -1,6 +1,6 @@
+use regex::Regex;
 use std::fs::File;
 use std::io::{BufReader, Read};
-use regex::Regex;
 
 pub fn day3() {
     let input = File::open("input/day_3.txt").unwrap();
@@ -13,8 +13,6 @@ pub fn day3() {
 
     let res = puzzle_2(&input);
     println!("day 3, puzzle 2: {res}");
-
-    
 }
 
 fn calc_line(input: &str) -> i32 {
@@ -32,7 +30,6 @@ fn puzzle_2(input: &str) -> i32 {
     for line in input.split("do()") {
         let enabled = line.split("don't()").next().unwrap();
         res += calc_line(enabled);
-        
     }
-    return res
+    return res;
 }

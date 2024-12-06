@@ -1,6 +1,5 @@
-use std::io::{BufRead, BufReader};
 use std::fs::File;
-
+use std::io::{BufRead, BufReader};
 
 pub fn day2() {
     let input = File::open("input/day_2.txt").unwrap();
@@ -11,7 +10,7 @@ pub fn day2() {
     for line in reader.lines() {
         if let Ok(l) = line {
             let report: Vec<i64> = l.split_whitespace().map(|x| x.parse().unwrap()).collect();
-            
+
             all_reports.push(report);
         }
     }
@@ -32,11 +31,11 @@ pub fn day2() {
 
 fn is_report_safe(rep: &Vec<i64>) -> bool {
     let mut diffs: Vec<i64> = vec![];
-    for i in 0..rep.len()-1 {
-        diffs.push(rep[i+1] - rep[i]);
+    for i in 0..rep.len() - 1 {
+        diffs.push(rep[i + 1] - rep[i]);
     }
     if diffs[0] == 0 {
-        return false
+        return false;
     }
 
     let min_diff = diffs.iter().min().unwrap();
@@ -44,12 +43,12 @@ fn is_report_safe(rep: &Vec<i64>) -> bool {
 
     if diffs[0] > 0 {
         if *min_diff > 0 && *max_diff < 4 {
-            return true
+            return true;
         }
     }
-    
+
     if *min_diff > -4 && *max_diff < 0 {
-        return true
+        return true;
     }
 
     false
@@ -63,13 +62,11 @@ fn is_report_tolerable(rep: &Vec<i64>) -> bool {
     let n = rep.len();
 
     for i in 0..n {
-        
-        let short_rep = [&rep[0..i], &rep[i+1..n]].concat();
+        let short_rep = [&rep[0..i], &rep[i + 1..n]].concat();
         if is_report_safe(&short_rep) {
-            return true
+            return true;
         }
     }
-
 
     false
 }

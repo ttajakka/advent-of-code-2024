@@ -9,16 +9,15 @@ fn main() {
     println!("====================");
     println!("");
 
-    if true {
-        day1();
-        println!("");
-        day2();
-        println!("");
-        day3();
-        println!("");
-        day4::puzzle1();
-        day4::puzzle2();
-    }
+    day1();
+    println!("");
+    day2();
+    println!("");
+    day3();
+    println!("");
+    day4::puzzle1();
+    day4::puzzle2();
     println!("");
     day5::puzzle1();
+    day5::puzzle2();
 }

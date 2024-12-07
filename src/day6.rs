@@ -8,8 +8,6 @@ type Direction = (i32, i32);
 pub fn puzzle1() {
     let mut map = read_input();
 
-    print_map(&map);
-
     let mut pos = find_initial_position(&map).unwrap();
     map[pos.0][pos.1] = 'X' as u8;
 
@@ -23,10 +21,6 @@ pub fn puzzle1() {
         pos = new.1;
         dir = new.2;
     }
-
-    println!("");
-
-    print_map(&map);
 
     let mut result = 0;
 
@@ -61,8 +55,6 @@ pub fn puzzle2() {
         pos = new.1;
         dir = new.2;
     }
-    println!("{initial_route:?}");
-    
 
     let mut result = 0;
 
@@ -72,9 +64,8 @@ pub fn puzzle2() {
         if init_map[i][j] == '.' as u8 {
             let mut map = init_map.clone();
             map[i][j] = '#' as u8;
-            println!("evaluating position {i} {j}");
             if results_in_loop(map, init_pos) {
-                println!("loop!");
+                println!("loop! {i} {j}");
 
                 result += 1;
             }
@@ -102,7 +93,7 @@ fn results_in_loop(mut map: Map, init_pos: Position) -> bool {
     }
 }
 
-fn print_map(map: &Map) {
+pub fn print_map(map: &Map) {
     for row in map {
         for c in row {
             print!("{}", *c as char);

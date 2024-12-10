@@ -37,4 +37,5 @@ fn main() {
         println!("");
     }
     day9::puzzle1();
+    day9::puzzle2();
 }

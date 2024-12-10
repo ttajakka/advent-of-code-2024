@@ -42,4 +42,5 @@ fn main() {
     }
 
     day10::puzzle1();
+    day10::puzzle2();
 }

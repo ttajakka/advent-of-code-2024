@@ -18,6 +18,19 @@ pub fn puzzle1() {
     println!("day 10, puzzle 1: {total_score}");
 }
 
+pub fn puzzle2() {
+    let map = parse_input();
+
+    let trailheads = find_trailheads(&map);
+
+    let mut total_score = 0;
+    for head in trailheads {
+        total_score += count_routes_recursive(&map, head);
+    }
+
+    println!("day 10, puzzle 2: {total_score}");
+}
+
 fn find_score(map: &Map, head: Position) -> usize {
     if map[head.0][head.1] != 0 {
         panic!();
@@ -26,11 +39,28 @@ fn find_score(map: &Map, head: Position) -> usize {
     return peaks.len();
 }
 
+fn count_routes_recursive(map: &Map, pos: Position) -> usize {
+    if map[pos.0][pos.1] == 9 {
+        return 1;
+    } else {
+        let mut routes = 0;
+        if pos.0 > 0 && map[pos.0 - 1][pos.1] == map[pos.0][pos.1] + 1 {
+            routes = count_routes_recursive(map, (pos.0 - 1, pos.1));
+        }
+        if pos.0 < map.len() - 1 && map[pos.0 + 1][pos.1] == map[pos.0][pos.1] + 1 {
+            routes += count_routes_recursive(map, (pos.0 + 1, pos.1));
+        }
+        if pos.1 > 0 && map[pos.0][pos.1 - 1] == map[pos.0][pos.1] + 1 {
+            routes += count_routes_recursive(map, (pos.0, pos.1 - 1));
+        }
+        if pos.1 < map[0].len() - 1 && map[pos.0][pos.1 + 1] == map[pos.0][pos.1] + 1 {
+            routes += count_routes_recursive(map, (pos.0, pos.1 + 1));
+        }
+        routes
+    }
+}
+
 fn find_peaks_recursive(map: &Map, pos: Position) -> Vec<Position> {
-    println!(
-        "finding peaks, pos: {} {}, height: {}",
-        pos.0, pos.1, map[pos.0][pos.1]
-    );
     if map[pos.0][pos.1] == 9 {
         return vec![pos];
     } else {

@@ -6,6 +6,7 @@ use advent_of_code_2024::day5;
 use advent_of_code_2024::day6;
 use advent_of_code_2024::day7;
 use advent_of_code_2024::day8;
+use advent_of_code_2024::day9;
 
 fn main() {
     println!("Advent of code, 2024");
@@ -32,7 +33,8 @@ fn main() {
         day7::puzzle2();
         println!("");
         day8::puzzle1();
+        day8::puzzle2();
+        println!("");
     }
-    println!("");
-    day8::puzzle2();
+    day9::puzzle1();
 }

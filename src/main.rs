@@ -1,5 +1,6 @@
 use advent_of_code_2024::day1::day1;
 use advent_of_code_2024::day10;
+use advent_of_code_2024::day11;
 use advent_of_code_2024::day2::day2;
 use advent_of_code_2024::day3::day3;
 use advent_of_code_2024::day4;
@@ -12,9 +13,9 @@ use advent_of_code_2024::day9;
 fn main() {
     println!("Advent of code, 2024");
     println!("====================");
-    println!("");
 
     if false {
+        println!("");
         day1();
         println!("");
         day2();
@@ -39,8 +40,10 @@ fn main() {
         day9::puzzle1();
         day9::puzzle2();
         println!("");
+        day10::puzzle1();
+        day10::puzzle2();
     }
-
-    day10::puzzle1();
-    day10::puzzle2();
+    println!("");
+    day11::puzzle1();
+    // day11::puzzle2();
 }

@@ -42,8 +42,9 @@ fn main() {
         println!("");
         day10::puzzle1();
         day10::puzzle2();
+        println!("");
+        day11::puzzle1();
     }
     println!("");
-    day11::puzzle1();
-    // day11::puzzle2();
+    day11::puzzle2();
 }

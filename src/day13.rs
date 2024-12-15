@@ -1,4 +1,4 @@
-use crate::util::read_input_2;
+use crate::util::read_input;
 use regex::Regex;
 use std::io::Read;
 
@@ -116,7 +116,7 @@ fn parse_claw(chunk: &str) -> Claw {
 }
 
 fn parse_input() -> Vec<Claw> {
-    let mut reader = read_input_2("input/day_13.txt");
+    let mut reader = read_input("input/day_13.txt");
     let mut buf = String::new();
     reader.read_to_string(&mut buf).unwrap();
     buf.split("\n\n").map(|chunk| parse_claw(chunk)).collect()

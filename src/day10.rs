@@ -107,7 +107,7 @@ fn find_trailheads(map: &Map) -> Vec<Position> {
 }
 
 fn parse_input() -> Map {
-    let reader = read_input("input/day_10.txt".to_string());
+    let reader = read_input("input/day_10.txt");
     let mut map = vec![];
     for line in reader.lines() {
         map.push(

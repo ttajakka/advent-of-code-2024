@@ -155,8 +155,7 @@ fn expand(input: &Vec<u8>) -> Vec<i32> {
 }
 
 fn parse_input() -> Vec<u8> {
-    let path = "input/day_9.txt".to_string();
-    let reader = read_input(path);
+    let reader = read_input("input/day_9.txt");
 
     return reader
         .lines()

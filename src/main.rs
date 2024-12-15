@@ -3,6 +3,8 @@ use advent_of_code_2024::day10;
 use advent_of_code_2024::day11;
 use advent_of_code_2024::day12;
 use advent_of_code_2024::day13;
+use advent_of_code_2024::day14;
+use advent_of_code_2024::day15;
 use advent_of_code_2024::day2::day2;
 use advent_of_code_2024::day3::day3;
 use advent_of_code_2024::day4;
@@ -11,13 +13,12 @@ use advent_of_code_2024::day6;
 use advent_of_code_2024::day7;
 use advent_of_code_2024::day8;
 use advent_of_code_2024::day9;
-use advent_of_code_2024::day14;
 
 fn main() {
     println!("Advent of code, 2024");
     println!("====================");
 
-    if false {
+    if true {
         println!("");
         day1();
         println!("");
@@ -51,12 +52,13 @@ fn main() {
         println!("");
         day12::puzzle1();
         day12::puzzle2();
+        println!("");
+        day13::puzzle1();
+        day13::puzzle2();
         println!();
         day14::puzzle1();
         day14::puzzle2();
     }
-    println!("");
-    day13::puzzle1();
-    day13::puzzle2();
-
+    println!();
+    day15::puzzle1();
 }

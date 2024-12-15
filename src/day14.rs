@@ -144,7 +144,7 @@ fn display_robots(robots: &Vec<Robot>) {
 }
 
 fn parse_input() -> Vec<Robot> {
-    let reader = read_input("input/day_14.txt".to_string());
+    let reader = read_input("input/day_14.txt");
     let mut out = vec![];
 
     let re = Regex::new(r"p=(.*[0-9]+),(.*[0-9]+) v=(.*[0-9]+),(.*[0-9]+)").unwrap();

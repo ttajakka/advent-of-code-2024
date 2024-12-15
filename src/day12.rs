@@ -301,7 +301,7 @@ fn identify_regions(input_map: &Map<Label>) -> (Map<RegionID>, HashMap<RegionID,
 }
 
 fn parse_input() -> Map<u8> {
-    let reader = read_input("input/day_12_mock3.txt".to_string());
+    let reader = read_input("input/day_12_mock3.txt");
     let out = reader
         .lines()
         .map(|line| line.unwrap().as_bytes().to_owned())

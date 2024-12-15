@@ -114,7 +114,7 @@ pub fn puzzle2() {
 }
 
 fn parse_input() -> Vec<u64> {
-    let reader = read_input("input/day_11.txt".to_string());
+    let reader = read_input("input/day_11.txt");
     reader
         .lines()
         .next()

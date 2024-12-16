@@ -18,47 +18,48 @@ fn main() {
     println!("Advent of code, 2024");
     println!("====================");
 
-    if true {
-        println!("");
+    if false {
+        println!();
         day1();
-        println!("");
+        println!();
         day2();
-        println!("");
+        println!();
         day3();
-        println!("");
+        println!();
         day4::puzzle1();
         day4::puzzle2();
-        println!("");
+        println!();
         day5::puzzle1();
         day5::puzzle2();
-        println!("");
+        println!();
         day6::puzzle1();
         day6::puzzle2();
-        println!("");
+        println!();
         day7::puzzle1();
         day7::puzzle2();
-        println!("");
+        println!();
         day8::puzzle1();
         day8::puzzle2();
-        println!("");
+        println!();
         day9::puzzle1();
         day9::puzzle2();
-        println!("");
+        println!();
         day10::puzzle1();
         day10::puzzle2();
-        println!("");
+        println!();
         day11::puzzle1();
         day11::puzzle2();
-        println!("");
+        println!();
         day12::puzzle1();
         day12::puzzle2();
-        println!("");
+        println!();
         day13::puzzle1();
         day13::puzzle2();
         println!();
         day14::puzzle1();
         day14::puzzle2();
+        println!();
+        day15::puzzle1();
     }
-    println!();
-    day15::puzzle1();
+    day15::puzzle2();
 }

@@ -39,18 +39,8 @@ pub fn puzzle2() {
 
     let keys = id_region_map.keys().collect::<Vec<&u32>>();
 
-    for i in 0..id_map.len() {
-        for j in 0..id_map.len() {
-            print!("{}", id_map[i][j]);
-        }
-        println!("");
-    }
-
     let (horizontal_fences, vertical_fences) = index_fences(&id_map);
     let fence_sides = count_fence_sides(keys, &horizontal_fences, &vertical_fences);
-
-    println!("fence sides: {fence_sides:#?}");
-    
 
     let mut res = 0;
 
@@ -75,38 +65,19 @@ fn count_fence_sides(
     let h_hor = hor.len();
     let w_hor = hor[0].len();
 
-    // let mut on_top_edge = false;
-    // let mut on_bottom_edge = false;
-
     for i in 0..h_hor {
         for j in 0..w_hor {
             let (top, bottom) = hor[i][j];
             if top != bottom {
-                // if (j == 0) || (j > 0 && hor[i][j - 1].0 != top) {
-                if (j == 0) || (j > 0) {
+                if (j == 0) || !(top == hor[i][j-1].0 && top != hor[i][j-1].1) {
                     *out.get_mut(&top).unwrap() += 1;
-                    if top == 3 {
-                        println!("{i} {j} top");
-                        
-                    }
                 }
-                if (j == 0) || (j > 0 && hor[i][j - 1].1 != bottom) {
-                // if (j == 0) || (j > 0) {
+                if (j == w_hor-1) || !(bottom == hor[i][j+1].1 && bottom != hor[i][j+1].0) {
                     *out.get_mut(&bottom).unwrap() += 1;
-                    if bottom == 3 {
-                        println!("{i} {j} bottom");
-                        
-                    }
                 }
-            } else {
-                // on_top_edge = false;
-                // on_bottom_edge = false;
             }
         }
     }
-
-    println!("{out:#?}");
-    
 
     let h_vert = vert.len();
     let w_vert = vert[0].len();
@@ -115,12 +86,10 @@ fn count_fence_sides(
         for j in 0..w_vert {
             let (left, right) = vert[i][j];
             if left != right {
-                if (i == 0) || (i > 0 && vert[i-1][j].0 != left) {
-                // if (i == 0) || (i > 0) {
+                if (i == 0) || !(left == vert[i-1][j].0 && left != vert[i-1][j].1) {
                     *out.get_mut(&left).unwrap() += 1;
                 }
-                if (i == 0) || (i > 0 && vert[i - 1][j].1 != right) {
-                // if (i == 0) || (i > 0) {
+                if (i == h_vert-1) || !(right == vert[i+1][j].1 && right != vert[i+1][j].0) {
                     *out.get_mut(&right).unwrap() += 1
                 }
             }
@@ -166,8 +135,8 @@ fn index_fences(map: &Map<u32>) -> (Map<IDPair>, Map<IDPair>) {
     let h = map.len();
     let w = map[0].len();
 
-    let mut horizontal_fences = vec![vec![(0, 0); w + 1]; h + 1];
-    let mut vertical_fences = vec![vec![(0, 0); w + 1]; h + 1];
+    let mut horizontal_fences = vec![vec![(0, 0); w]; h + 1];
+    let mut vertical_fences = vec![vec![(0, 0); w + 1]; h];
 
     for i in 0..h {
         for j in 0..w {
@@ -301,7 +270,7 @@ fn identify_regions(input_map: &Map<Label>) -> (Map<RegionID>, HashMap<RegionID,
 }
 
 fn parse_input() -> Map<u8> {
-    let reader = read_input("input/day_12_mock3.txt");
+    let reader = read_input("input/day_12.txt");
     let out = reader
         .lines()
         .map(|line| line.unwrap().as_bytes().to_owned())

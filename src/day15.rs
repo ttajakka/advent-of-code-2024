@@ -1,6 +1,4 @@
 use std::io::Read;
-use std::thread::sleep;
-use std::time::Duration;
 
 use crate::util::read_input;
 
@@ -107,7 +105,7 @@ fn find_robot(map: &Map) -> (i32, i32) {
 }
 
 fn parse_input() -> Warehouse {
-    let mut reader = read_input("input/day_15_mock.txt");
+    let mut reader = read_input("input/day_15.txt");
     let mut buf = String::new();
     reader.read_to_string(&mut buf).unwrap();
 
@@ -135,8 +133,6 @@ fn parse_input() -> Warehouse {
 
 #[derive(Debug)]
 struct BigWarehouse {
-    height: usize,
-    width: usize,
     map: Map,
     robot: (i32, i32),
     instructions: Instructions,
@@ -179,8 +175,6 @@ impl BigWarehouse {
         }
 
         BigWarehouse {
-            height,
-            width,
             map,
             robot: (wh.robot.0, 2 * wh.robot.1),
             instructions: wh.instructions,
@@ -307,7 +301,55 @@ impl BigWarehouse {
     }
 
     fn move_box(&mut self, pos: (i32, i32), instr: char) {
-
+        match instr {
+            '<' => {
+                if self.map[pos.0 as usize][pos.1 as usize - 2] == '[' {
+                    self.move_box((pos.0, pos.1 - 2), instr);
+                };
+                self.map[pos.0 as usize][pos.1 as usize - 1] = '[';
+                self.map[pos.0 as usize][pos.1 as usize] = ']';
+                self.map[pos.0 as usize][pos.1 as usize + 1] = '.';
+            }
+            '>' => {
+                if self.map[pos.0 as usize][pos.1 as usize + 2] == '[' {
+                    self.move_box((pos.0, pos.1 + 2), instr);
+                };
+                self.map[pos.0 as usize][pos.1 as usize + 2] = ']';
+                self.map[pos.0 as usize][pos.1 as usize + 1] = '[';
+                self.map[pos.0 as usize][pos.1 as usize] = '.';
+            }
+            '^' => {
+                if self.map[pos.0 as usize - 1][pos.1 as usize - 1] == '[' {
+                    self.move_box((pos.0 - 1, pos.1 - 1), instr);
+                };
+                if self.map[pos.0 as usize - 1][pos.1 as usize] == '[' {
+                    self.move_box((pos.0 - 1, pos.1), instr);
+                };
+                if self.map[pos.0 as usize - 1][pos.1 as usize + 1] == '[' {
+                    self.move_box((pos.0 - 1, pos.1 + 1), instr);
+                };
+                self.map[pos.0 as usize - 1][pos.1 as usize] = '[';
+                self.map[pos.0 as usize - 1][pos.1 as usize + 1] = ']';
+                self.map[pos.0 as usize][pos.1 as usize] = '.';
+                self.map[pos.0 as usize][pos.1 as usize + 1] = '.';
+            }
+            'v' => {
+                if self.map[pos.0 as usize + 1][pos.1 as usize - 1] == '[' {
+                    self.move_box((pos.0 + 1, pos.1 - 1), instr);
+                };
+                if self.map[pos.0 as usize + 1][pos.1 as usize] == '[' {
+                    self.move_box((pos.0 + 1, pos.1), instr);
+                };
+                if self.map[pos.0 as usize + 1][pos.1 as usize + 1] == '[' {
+                    self.move_box((pos.0 + 1, pos.1 + 1), instr);
+                };
+                self.map[pos.0 as usize + 1][pos.1 as usize] = '[';
+                self.map[pos.0 as usize + 1][pos.1 as usize + 1] = ']';
+                self.map[pos.0 as usize][pos.1 as usize] = '.';
+                self.map[pos.0 as usize][pos.1 as usize + 1] = '.';
+            }
+            _ => panic!(),
+        }
     }
 
     fn gps_sum(&self) -> usize {
@@ -325,16 +367,11 @@ impl BigWarehouse {
 
 pub fn puzzle2() {
     let mut warehouse = BigWarehouse::from_warehouse(parse_input());
-    warehouse.instructions = vec!['^', '>', '>', '>', '>'];
-    print_map(&warehouse.map);
 
     while warehouse.instructions.len() > 0 {
         warehouse.step();
-        print_map(&warehouse.map);
-        println!("");
-        println!("");
-        sleep(Duration::from_millis(1000));
     }
+
     let res = warehouse.gps_sum();
     println!("day 15, puzzle 1: {res}");
 }

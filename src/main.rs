@@ -59,7 +59,8 @@ fn main() {
         day14::puzzle1();
         day14::puzzle2();
         println!();
-        day15::puzzle1();
+        println!()
     }
+    day15::puzzle1();
     day15::puzzle2();
 }

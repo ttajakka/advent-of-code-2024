@@ -29,6 +29,7 @@ struct Reindeer {
     dir: (i64, i64),
     dist: u64,
     timeout: u64,
+    history: Vec<(i64, i64)>,
 }
 
 pub fn puzzle1() {
@@ -45,6 +46,7 @@ pub fn puzzle1_runner() -> u64 {
         dir: (0, 1),
         dist: 0,
         timeout: 0,
+        history: vec![race.start],
     }];
 
     let mut frontline_len = frontline.len();
@@ -57,13 +59,17 @@ pub fn puzzle1_runner() -> u64 {
         }
         round_count += 1;
 
+        let mut next_visited = vec![];
+
         let mut next_frontline = vec![];
         for reindeer in &frontline {
             if reindeer.pos == race.end {
                 return reindeer.dist;
             } else if reindeer.timeout > 0 {
+                let history = reindeer.history.clone();
                 next_frontline.push(Reindeer {
                     timeout: reindeer.timeout - 1,
+                    history,
                     ..*reindeer
                 })
             } else {
@@ -71,12 +77,15 @@ pub fn puzzle1_runner() -> u64 {
                     let dir = (-reindeer.dir.1, reindeer.dir.0);
                     let pos = (reindeer.pos.0 + dir.0, reindeer.pos.1 + dir.1);
                     if !visited.contains(&(pos, dir)) {
-                        visited.push((pos, dir));
+                        next_visited.push((pos, dir));
+                        let mut history = reindeer.history.clone();
+                        history.push(reindeer.pos);
                         next_frontline.push(Reindeer {
                             pos,
                             dir,
                             dist: reindeer.dist + 1001,
                             timeout: TIMEOUT,
+                            history,
                         })
                     }
                 }
@@ -85,13 +94,16 @@ pub fn puzzle1_runner() -> u64 {
                     let dir = reindeer.dir;
                     let pos = (reindeer.pos.0 + dir.0, reindeer.pos.1 + dir.1);
                     if !visited.contains(&(pos, dir)) {
-                        visited.push((pos, dir));
+                        next_visited.push((pos, dir));
+                        let mut history = reindeer.history.clone();
+                        history.push(reindeer.pos);
                         next_frontline.push({
                             Reindeer {
                                 pos,
                                 dir,
                                 dist: reindeer.dist + 1,
                                 timeout: 0,
+                                history,
                             }
                         })
                     }
@@ -101,18 +113,29 @@ pub fn puzzle1_runner() -> u64 {
                     let dir = (reindeer.dir.1, -reindeer.dir.0);
                     let pos = (reindeer.pos.0 + dir.0, reindeer.pos.1 + dir.1);
                     if !visited.contains(&(pos, dir)) {
-                        visited.push((pos, dir));
-                    next_frontline.push({
-                        Reindeer {
-                            pos,
-                            dir,
-                            dist: reindeer.dist + 1001,
-                            timeout: TIMEOUT,
-                        }
-                    })}
+                        next_visited.push((pos, dir));
+                        let mut history = reindeer.history.clone();
+                        history.push(reindeer.pos);
+                        next_frontline.push({
+                            Reindeer {
+                                pos,
+                                dir,
+                                dist: reindeer.dist + 1001,
+                                timeout: TIMEOUT,
+                                history,
+                            }
+                        })
+                    }
                 }
             }
         }
+
+        for v in next_visited {
+            if !visited.contains(&v) {
+                visited.push(v)
+            }
+        }
+
         frontline = next_frontline;
         frontline_len = frontline.len();
 

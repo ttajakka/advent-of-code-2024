@@ -65,11 +65,11 @@ fn main() {
         day15::puzzle1();
         day15::puzzle2();
         println!();
-        day16::puzzle1();
         println!();
         day17::puzzle1();
         day17::puzzle2();
+        println!("");
+        day18::puzzle1();
     }
-    println!("");
-    day18::puzzle1();
+    day16::puzzle1();
 }

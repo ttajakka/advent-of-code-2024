@@ -2,10 +2,11 @@ use crate::util::read_input;
 use rand::Rng;
 use std::io::BufRead;
 
-// use std::thread::sleep;
-// use std::time::Duration;
+use std::thread::sleep;
+use std::time::Duration;
 
 const MAX: u64 = std::u64::MAX;
+const TIMEOUT: u64 = 1000;
 
 enum Direction {
     Right,
@@ -15,45 +16,114 @@ enum Direction {
 
 type Map = Vec<Vec<char>>;
 
-struct Race {
+pub struct Race {
     map: Vec<Vec<char>>,
     start: (i64, i64),
     end: (i64, i64),
-    count: usize
+    count: usize,
+}
+
+#[derive(Debug)]
+struct Reindeer {
+    pos: (i64, i64),
+    dir: (i64, i64),
+    dist: u64,
+    timeout: u64,
 }
 
 pub fn puzzle1() {
-    let mut race = parse_input();
-    println!("{}", race.count);
-    
-
-    let mut res = MAX;
-    // let mut dist_from_start = 0;
-
-    for i in 0..10000000 {
-        let (simulated, pos) = monte_carlo(&mut race);
-        println!("{}", count_dots(&race.map));
-        // if race.start.0 - pos.0 + race.start.1 - pos.1 > dist_from_start {
-        //     dist_from_start = race.start.0 - pos.0 + race.start.1 - pos.1;
-        //     println!("{pos:?}: {dist_from_start}");
-            
-        // } 
-        println!("{pos:?}");
-        if simulated < MAX {
-
-            println!("{i}: {simulated}");
-        }
-        
-        if simulated < res {
-            res = simulated;
-        }
-    }
-
+    let res = puzzle1_runner();
     println!("day 16, puzzle 1: {res}");
-    
 }
 
-fn monte_carlo(race: &mut Race) -> (u64, (i64, i64)) {
+pub fn puzzle1_runner() -> u64 {
+    let race = parse_input();
+    println!("{}", race.count);
+
+    let mut frontline = vec![Reindeer {
+        pos: race.start,
+        dir: (0, 1),
+        dist: 0,
+        timeout: 0,
+    }];
+
+    let mut frontline_len = frontline.len();
+    let mut round_count = 0;
+    let mut visited = vec![(race.start, (0, 1))];
+
+    while frontline_len > 0 {
+        if round_count % 100 == 0 {
+            println!("round {round_count}: {} reindeers", frontline_len);
+        }
+        round_count += 1;
+
+        let mut next_frontline = vec![];
+        for reindeer in &frontline {
+            if reindeer.pos == race.end {
+                return reindeer.dist;
+            } else if reindeer.timeout > 0 {
+                next_frontline.push(Reindeer {
+                    timeout: reindeer.timeout - 1,
+                    ..*reindeer
+                })
+            } else {
+                if can_move_left(&race.map, &reindeer.pos, &reindeer.dir) {
+                    let dir = (-reindeer.dir.1, reindeer.dir.0);
+                    let pos = (reindeer.pos.0 + dir.0, reindeer.pos.1 + dir.1);
+                    if !visited.contains(&(pos, dir)) {
+                        visited.push((pos, dir));
+                        next_frontline.push(Reindeer {
+                            pos,
+                            dir,
+                            dist: reindeer.dist + 1001,
+                            timeout: TIMEOUT,
+                        })
+                    }
+                }
+
+                if can_move_straight(&race.map, &reindeer.pos, &reindeer.dir) {
+                    let dir = reindeer.dir;
+                    let pos = (reindeer.pos.0 + dir.0, reindeer.pos.1 + dir.1);
+                    if !visited.contains(&(pos, dir)) {
+                        visited.push((pos, dir));
+                        next_frontline.push({
+                            Reindeer {
+                                pos,
+                                dir,
+                                dist: reindeer.dist + 1,
+                                timeout: 0,
+                            }
+                        })
+                    }
+                }
+
+                if can_move_right(&race.map, &reindeer.pos, &reindeer.dir) {
+                    let dir = (reindeer.dir.1, -reindeer.dir.0);
+                    let pos = (reindeer.pos.0 + dir.0, reindeer.pos.1 + dir.1);
+                    if !visited.contains(&(pos, dir)) {
+                        visited.push((pos, dir));
+                    next_frontline.push({
+                        Reindeer {
+                            pos,
+                            dir,
+                            dist: reindeer.dist + 1001,
+                            timeout: TIMEOUT,
+                        }
+                    })}
+                }
+            }
+        }
+        frontline = next_frontline;
+        frontline_len = frontline.len();
+
+        if false {
+            sleep(Duration::from_millis(100));
+        }
+    }
+    return MAX;
+}
+
+pub fn monte_carlo(race: &mut Race) -> (u64, (i64, i64)) {
     let mut pos = race.start;
     let mut dir: (i64, i64) = (0, 1);
     let mut dist = 0;
@@ -74,7 +144,6 @@ fn monte_carlo(race: &mut Race) -> (u64, (i64, i64)) {
             if (pos.0 - race.start.0).abs() > 2 && (pos.0 - race.start.0).abs() > 2 {
                 race.map[pos.0 as usize][pos.1 as usize] = '#';
                 println!("tilkitty, {}", count_dots(&race.map));
-                
             }
             return (MAX, pos);
         }
@@ -99,7 +168,7 @@ fn monte_carlo(race: &mut Race) -> (u64, (i64, i64)) {
         pos = (pos.0 + dir.0, pos.1 + dir.1);
 
         if pos == race.end {
-            return (dist, pos)
+            return (dist, pos);
         }
     }
 
@@ -172,9 +241,13 @@ fn parse_input() -> Race {
 
     println!("start: {start:?}");
     println!("end: {end:?}");
-    
-    println!("count: {count}");
-    
 
-    Race { map, start, end, count }
+    println!("count: {count}");
+
+    Race {
+        map,
+        start,
+        end,
+        count,
+    }
 }

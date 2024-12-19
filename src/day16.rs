@@ -33,11 +33,23 @@ struct Reindeer {
 }
 
 pub fn puzzle1() {
+    let race = parse_input();
     let res = puzzle1_runner();
-    println!("day 16, puzzle 1: {res}");
+    println!("day 16, puzzle 1: {}", res[0].dist);
+
+    let mut visited = vec![race.start, race.end];
+    for r in res {
+        for v in r.history {
+            if !visited.contains(&v) {
+                visited.push(v)
+            }
+        }
+    }
+
+    println!("day 16, puzzle 2: {}", visited.len())
 }
 
-pub fn puzzle1_runner() -> u64 {
+fn puzzle1_runner() -> Vec<Reindeer> {
     let race = parse_input();
     println!("{}", race.count);
 
@@ -53,6 +65,8 @@ pub fn puzzle1_runner() -> u64 {
     let mut round_count = 0;
     let mut visited = vec![(race.start, (0, 1))];
 
+    let mut finishers = vec![];
+
     while frontline_len > 0 {
         if round_count % 100 == 0 {
             println!("round {round_count}: {} reindeers", frontline_len);
@@ -64,7 +78,11 @@ pub fn puzzle1_runner() -> u64 {
         let mut next_frontline = vec![];
         for reindeer in &frontline {
             if reindeer.pos == race.end {
-                return reindeer.dist;
+                let re = Reindeer {
+                    history: reindeer.history.clone(),
+                    ..*reindeer
+                };
+                finishers.push(re);
             } else if reindeer.timeout > 0 {
                 let history = reindeer.history.clone();
                 next_frontline.push(Reindeer {
@@ -142,8 +160,11 @@ pub fn puzzle1_runner() -> u64 {
         if false {
             sleep(Duration::from_millis(100));
         }
+        if finishers.len() > 0 {
+            break;
+        }
     }
-    return MAX;
+    return finishers;
 }
 
 pub fn monte_carlo(race: &mut Race) -> (u64, (i64, i64)) {

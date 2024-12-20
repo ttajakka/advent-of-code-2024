@@ -77,4 +77,5 @@ fn main() {
         day19::puzzle1();
     }
     day20::puzzle1();
+    day20::puzzle2();
 }

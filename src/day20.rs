@@ -1,7 +1,6 @@
+use crate::util::read_input;
 use core::panic;
 use std::io::Read;
-
-use crate::util::read_input;
 
 struct Track {
     map: Vec<Vec<char>>,
@@ -12,6 +11,14 @@ struct Track {
 }
 
 pub fn puzzle1() {
+    println!("day 20, puzzle 1: {}", puzzle_runner(2));
+}
+
+pub fn puzzle2() {
+    println!("day 20, puzzle 2: {}", puzzle_runner(20));
+}
+
+fn puzzle_runner(max_cheat: i32) -> i32 {
     let track = parse_input();
 
     let (labeled, path) = label_track(&track);
@@ -20,35 +27,26 @@ pub fn puzzle1() {
 
     for pos in path {
         let current = labeled[pos.0][pos.1];
-        if pos.0 > 2 && labeled[pos.0 - 2][pos.1] > current + 2 {
-            let diff = labeled[pos.0 - 2][pos.1] - current - 2;
-            if diff >= 100 {
-                res += 1;
-            }
-        }
-        if pos.0 < track.height - 2 && labeled[pos.0 + 2][pos.1] > current + 2 {
-            let diff = labeled[pos.0 + 2][pos.1] - current - 2;
-            if diff >= 100 {
-                res += 1;
-            }
-        }
-        if pos.1 > 2 && labeled[pos.0][pos.1 - 2] > current + 2 {
-            let diff = labeled[pos.0][pos.1 - 2] - current - 2;
-            if diff >= 100 {
-                res += 1;
-            }
-        }
-        if pos.1 < track.width - 2 && labeled[pos.0][pos.1 + 2] > current + 2 {
-            let diff = labeled[pos.0][pos.1 + 2] - current - 2;
-            if diff >= 100 {
-                res += 1;
+        for i in -max_cheat..max_cheat + 1 {
+            for j in -(max_cheat - i.abs())..(max_cheat - i.abs()) + 1 {
+                let test_pos = (pos.0 as i32 + i, pos.1 as i32 + j);
+
+                if 0 <= test_pos.0
+                    && test_pos.0 < track.height as i32
+                    && 0 <= test_pos.1
+                    && test_pos.1 < track.width as i32
+                {
+                    let test_pos = (test_pos.0 as usize, test_pos.1 as usize);
+                    let diff =
+                        labeled[test_pos.0][test_pos.1] as i32 - current as i32 - i.abs() - j.abs();
+                    if diff >= 100 {
+                        res += 1;
+                    }
+                }
             }
         }
     }
-
-    println!("day 20, puzzle 1: {res}");
-    
-    
+    res
 }
 
 fn label_track(track: &Track) -> (Vec<Vec<usize>>, Vec<(usize, usize)>) {

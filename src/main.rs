@@ -12,6 +12,7 @@ use advent_of_code_2024::day19;
 use advent_of_code_2024::day20;
 use advent_of_code_2024::day21;
 use advent_of_code_2024::day22;
+use advent_of_code_2024::day23;
 use advent_of_code_2024::day2::day2;
 use advent_of_code_2024::day3::day3;
 use advent_of_code_2024::day4;
@@ -84,6 +85,7 @@ fn main() {
         day21::puzzle1();
         println!("");
         day22::puzzle1();
+        day22::puzzle2();
     }
-    day22::puzzle2();
+    day23::puzzle1();
 }

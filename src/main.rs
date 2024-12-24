@@ -9,11 +9,12 @@ use advent_of_code_2024::day16;
 use advent_of_code_2024::day17;
 use advent_of_code_2024::day18;
 use advent_of_code_2024::day19;
+use advent_of_code_2024::day2::day2;
 use advent_of_code_2024::day20;
 use advent_of_code_2024::day21;
 use advent_of_code_2024::day22;
 use advent_of_code_2024::day23;
-use advent_of_code_2024::day2::day2;
+use advent_of_code_2024::day24;
 use advent_of_code_2024::day3::day3;
 use advent_of_code_2024::day4;
 use advent_of_code_2024::day5;
@@ -86,6 +87,8 @@ fn main() {
         println!("");
         day22::puzzle1();
         day22::puzzle2();
+        println!("");
+        day23::puzzle1();
     }
-    day23::puzzle1();
+    day24::puzzle1();
 }

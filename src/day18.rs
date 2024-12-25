@@ -1,10 +1,7 @@
 use crate::util::read_input;
 use std::{collections::HashMap, io::BufRead};
-// use std::thread::sleep;
-// use std::time::Duration;
 
 const ENV: &str = "REAL";
-// const ENV: &str = "MOCK";
 const MAX: i32 = std::i32::MAX;
 
 type Graph = HashMap<(usize, usize), Vec<(usize, usize)>>;
@@ -24,7 +21,7 @@ pub fn puzzle1() {
         size = 7;
     }
     let mut map = vec![vec!['.'; size]; size];
-    
+
     for i in 0..byte_count {
         let (x, y) = bytes[i];
         map[x][y] = '#'; // NOTE: indices should be flipped!
@@ -33,9 +30,52 @@ pub fn puzzle1() {
     let graph = create_graph(&map);
     let (mut distance_estimates, mut predecessors) = initialize_single_source(&graph, (0, 0));
     dijkstra(&graph, &mut distance_estimates, &mut predecessors);
-    
-    let destination= (size-1, size-1);
-    println!("day 18, puzzle 1: {}", distance_estimates.get(&destination).unwrap());
+
+    let destination = (size - 1, size - 1);
+    println!(
+        "day 18, puzzle 1: {}",
+        distance_estimates.get(&destination).unwrap()
+    );
+}
+
+pub fn puzzle2() {
+    let bytes = parse_input();
+
+    let size;
+    let mut bytes_lower: usize;
+    let mut bytes_upper: usize = bytes.len() - 1;
+    if ENV == "REAL" {
+        size = 71;
+        bytes_lower = 1024;
+    } else {
+        bytes_lower = 12;
+        size = 7;
+    }
+    let destination = (size - 1, size - 1);
+
+    while bytes_lower + 1 < bytes_upper {
+        let byte_count = (bytes_lower + bytes_upper) / 2;
+        
+        let mut map = vec![vec!['.'; size]; size];
+
+        for i in 0..byte_count {
+            let (x, y) = bytes[i];
+            map[x][y] = '#';
+        }
+
+        let graph = create_graph(&map);
+        let (mut distance_estimates, mut predecessors) = initialize_single_source(&graph, (0, 0));
+        dijkstra(&graph, &mut distance_estimates, &mut predecessors);
+
+        if *distance_estimates.get(&destination).unwrap() == MAX {
+            bytes_upper = byte_count;
+        } else {
+            bytes_lower= byte_count;
+        }
+    }
+
+    let problem_coords = bytes[bytes_upper-1];
+    println!("day 18, puzzle 2: {},{}", problem_coords.0, problem_coords.1);
     
 }
 
@@ -44,6 +84,9 @@ fn dijkstra(graph: &Graph, distance_estimates: &mut Distances, predecessors: &mu
     while queue.len() > 0 {
         let min = extract_min(&mut queue, &distance_estimates);
         let min_d = distance_estimates.get(&min).unwrap().clone();
+        if min_d == MAX {
+            break;
+        }
         let to_relax = graph.get(&min).unwrap();
         for v in to_relax {
             let d = distance_estimates.get_mut(v).unwrap();

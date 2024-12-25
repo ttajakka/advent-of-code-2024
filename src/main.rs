@@ -77,7 +77,6 @@ fn main() {
         day17::puzzle1();
         day17::puzzle2();
         println!("");
-        day18::puzzle1();
         println!("");
         day19::puzzle1();
         println!();
@@ -92,6 +91,8 @@ fn main() {
         day23::puzzle1();
         println!("");
         day24::puzzle1();
+        println!();
+        day25::puzzle1();
     }
-    day25::puzzle1();
+    day18::puzzle1();
 }

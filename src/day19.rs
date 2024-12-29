@@ -17,7 +17,6 @@ pub fn puzzle1() {
         }
     }
 
-
     println!("day 19, puzzle 1: {res}");
 }
 
@@ -25,7 +24,7 @@ fn filter_alphabet(alphabet: Alphabet) -> Alphabet {
     let mut filtered: HashMap<usize, Vec<String>> = HashMap::new();
     let mut keys = alphabet.keys().collect::<Vec<_>>();
     keys.sort();
-    
+
     for k in keys {
         filtered.insert(*k, vec![]);
         for word in alphabet.get(k).unwrap() {
@@ -36,7 +35,7 @@ fn filter_alphabet(alphabet: Alphabet) -> Alphabet {
         }
     }
     filtered
-} 
+}
 
 fn word_is_possible(word: String, alphabet: &Alphabet, level: usize) -> bool {
     if word.len() == 0 {
@@ -86,4 +85,47 @@ fn parse_input() -> (HashMap<usize, Vec<String>>, Vec<String>) {
         .collect();
 
     (alphabet, words)
+}
+
+pub fn puzzle2() {
+    let (alphabet, words) = parse_input();
+
+    let mut res = 0;
+
+    let mut keys = alphabet.keys().clone().collect::<Vec<_>>();
+    keys.sort();
+
+    for word in words {
+        let mut partial_factorization_counts: Vec<Option<u64>> = vec![None; word.len() + 1];
+        partial_factorization_counts[0] = Some(1);
+        res += count_factorizations(&word, &mut partial_factorization_counts, &keys, &alphabet);
+    }
+
+    println!("day 19, puzzle 2: {res}");
+}
+
+fn count_factorizations(
+    word: &String,
+    counts: &mut Vec<Option<u64>>,
+    keys: &Vec<&usize>,
+    alphabet: &Alphabet,
+) -> u64 {
+    if let Some(count) = counts[word.len()] {
+        return count;
+    }
+
+    let mut count = 0;
+    for k in keys {
+        for a in alphabet.get(k).unwrap() {
+            if word.starts_with(a) {
+                let shorter_word = word.clone().split_off(**k);
+                count += count_factorizations(&shorter_word, counts, keys, alphabet);
+                break;
+            }
+        }
+    }
+
+    counts[word.len()] = Some(count);
+
+    count
 }

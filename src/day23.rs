@@ -81,3 +81,49 @@ fn parse_input() -> HashMap<String, Vec<String>> {
 
     graph
 }
+
+pub fn puzzle2() {
+    let graph = parse_input();
+
+    let mut nodes = graph.keys().to_owned().collect::<Vec<_>>();
+    nodes.sort();
+
+    let mut maximum_clique: Vec<String> = vec![];
+
+    for node in nodes {
+        let max_clique = find_max_clique(vec![node.to_owned()], graph.get(node).unwrap().to_owned(), &graph);
+        if max_clique.len() > maximum_clique.len() {
+            maximum_clique = max_clique;
+        }
+    }
+
+    maximum_clique.sort();
+
+    println!("{}", maximum_clique.join(","));
+    
+}
+
+fn find_max_clique(clique: Vec<String>, candidates: Vec<String>, graph: &HashMap<String, Vec<String>>) -> Vec<String> {
+    for i in 0..candidates.len() {
+        let cand = &candidates[i];
+        let mut can_extend = true;
+        for node in &clique {
+            if graph.get(node) == None || !graph.get(node).unwrap().contains(&cand) {
+                can_extend = false;
+                break;
+            }
+        }
+
+        if can_extend {
+            let candidates = candidates.clone().split_off(i+1);
+            let mut clique: Vec<String> = clique.clone();
+            clique.push(cand.clone());
+            return find_max_clique(clique, candidates, graph)
+        }
+
+    }
+    return clique
+}
+
+
+

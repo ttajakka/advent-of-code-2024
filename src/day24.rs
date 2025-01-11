@@ -60,7 +60,6 @@ pub fn puzzle1() {
     }
 
     println!("day 24, puzzle 1: {res}");
-    
 }
 
 fn parse_input() -> (HashMap<String, u8>, Vec<Gate>) {
@@ -100,4 +99,22 @@ fn parse_input() -> (HashMap<String, u8>, Vec<Gate>) {
     }
 
     (wires, gates)
+}
+
+pub fn puzzle2() {
+
+/*
+dnc XOR rtp -> cdj
+y08 AND x08 -> z08
+
+x38 XOR y38 -> dhm
+x38 AND y38 -> qjd
+
+btj XOR tmm -> mrb
+btj AND tmm -> z16
+
+kcv XOR pqv -> gfm
+jbc OR mnv -> z32
+
+ */
 }

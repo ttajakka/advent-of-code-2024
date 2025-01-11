@@ -93,10 +93,11 @@ fn main() {
         day22::puzzle2();
         println!("");
         day23::puzzle1();
+        day23::puzzle2();
         println!("");
         day24::puzzle1();
         println!();
         day25::puzzle1();
     }
-    day23::puzzle2();
+    day24::puzzle2();
 }

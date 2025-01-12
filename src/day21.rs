@@ -6,7 +6,8 @@ use crate::util::read_input;
 pub fn puzzle1() {
     let input = parse_input();
 
-    let level_2_distances = generate_arrow_distances_level_2();
+    let level_1_distances = generate_arrow_distances_level_1();
+    let level_2_distances = generate_next_level_arrow_distances(level_1_distances);
 
     let mut res = 0;
 
@@ -44,10 +45,10 @@ fn generate_arrow_distances_level_1() -> HashMap<(char, char), i32> {
     distances
 }
 
-fn generate_arrow_distances_level_2() -> HashMap<(char, char), i32> {
+fn generate_next_level_arrow_distances(previous_level_distances: HashMap<(char,char), i32>) -> HashMap<(char, char), i32> {
     let mut distances = HashMap::new();
 
-    let level_1_distances = generate_arrow_distances_level_1();
+    // let level_1_distances = generate_arrow_distances_level_1();
 
     let keys = vec!['<', 'v', '>', '^', 'A'];
     for from in &keys {
@@ -55,7 +56,7 @@ fn generate_arrow_distances_level_2() -> HashMap<(char, char), i32> {
             let paths = generate_arrow_paths(from, to);
             let mut min = std::i32::MAX;
             for path in paths {
-                let candidate = path_length(path, &level_1_distances);
+                let candidate = path_length(path, &previous_level_distances);
                 if candidate < min {
                     min = candidate;
                 }

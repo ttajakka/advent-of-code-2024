@@ -100,4 +100,5 @@ fn main() {
         day25::puzzle1();
     }
     day21::puzzle1();
+    day21::puzzle2();
 }

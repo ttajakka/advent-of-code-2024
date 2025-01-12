@@ -21,13 +21,42 @@ pub fn puzzle1() {
             length += calculate_numpad_distance(&chars[i], &chars[i + 1], &level_2_distances)
         }
 
-        res += (code.0 as i32) * length;
+        res += (code.0 as u64) * length;
     }
 
     println!("day 21, puzzle 1: {res}");
 }
 
-fn generate_arrow_distances_level_1() -> HashMap<(char, char), i32> {
+pub fn puzzle2() {
+    let input = parse_input();
+
+    // let level_1_distances = generate_arrow_distances_level_1();
+    // let level_2_distances = generate_next_level_arrow_distances(level_1_distances);
+    let mut arrow_distances = generate_arrow_distances_level_1();
+
+    for _ in 0..24 {
+        arrow_distances = generate_next_level_arrow_distances(arrow_distances);
+    }
+
+    let mut res = 0;
+
+    for code in input {
+        let mut chars = vec!['A'];
+        let mut to_append = code.1.chars().collect::<Vec<char>>();
+        chars.append(&mut to_append);
+
+        let mut length = 0;
+        for i in 0..chars.len() - 1 {
+            length += calculate_numpad_distance(&chars[i], &chars[i + 1], &arrow_distances)
+        }
+
+        res += (code.0 as u64) * length;
+    }
+
+    println!("day 21, puzzle 1: {res}");
+}
+
+fn generate_arrow_distances_level_1() -> HashMap<(char, char), u64> {
     let mut distances = HashMap::new();
 
     let keys = vec!['<', 'v', '>', '^', 'A'];
@@ -37,7 +66,7 @@ fn generate_arrow_distances_level_1() -> HashMap<(char, char), i32> {
             let to_pos = arrow_to_pos(to);
             distances.insert(
                 (*from, *to),
-                (from_pos.0 - to_pos.0).abs() + (from_pos.1 - to_pos.1).abs() + 1,
+                (from_pos.0 - to_pos.0).abs() as u64 + (from_pos.1 - to_pos.1).abs() as u64 + 1,
             );
         }
     }
@@ -45,16 +74,16 @@ fn generate_arrow_distances_level_1() -> HashMap<(char, char), i32> {
     distances
 }
 
-fn generate_next_level_arrow_distances(previous_level_distances: HashMap<(char,char), i32>) -> HashMap<(char, char), i32> {
+fn generate_next_level_arrow_distances(
+    previous_level_distances: HashMap<(char, char), u64>,
+) -> HashMap<(char, char), u64> {
     let mut distances = HashMap::new();
-
-    // let level_1_distances = generate_arrow_distances_level_1();
 
     let keys = vec!['<', 'v', '>', '^', 'A'];
     for from in &keys {
         for to in &keys {
             let paths = generate_arrow_paths(from, to);
-            let mut min = std::i32::MAX;
+            let mut min = std::u64::MAX;
             for path in paths {
                 let candidate = path_length(path, &previous_level_distances);
                 if candidate < min {
@@ -136,7 +165,7 @@ fn generate_arrow_paths(from: &char, to: &char) -> Vec<Vec<char>> {
     paths
 }
 
-fn path_length(mut path: Vec<char>, distances: &HashMap<(char, char), i32>) -> i32 {
+fn path_length(mut path: Vec<char>, distances: &HashMap<(char, char), u64>) -> u64 {
     let mut tmp_path = vec!['A'];
     tmp_path.append(&mut path);
     let path = tmp_path;
@@ -247,10 +276,10 @@ fn generate_num_paths(from: &char, to: &char) -> Vec<Vec<char>> {
 fn calculate_numpad_distance(
     from: &char,
     to: &char,
-    level_2_distances: &HashMap<(char, char), i32>,
-) -> i32 {
+    level_2_distances: &HashMap<(char, char), u64>,
+) -> u64 {
     let paths = generate_num_paths(from, to);
-    let mut min = std::i32::MAX;
+    let mut min = std::u64::MAX;
     for path in paths {
         let candidate = path_length(path, &level_2_distances);
         if candidate < min {

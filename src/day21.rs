@@ -1,101 +1,265 @@
 use core::panic;
-use std::io::BufRead;
+use std::{collections::HashMap, io::BufRead};
 
 use crate::util::read_input;
 
 pub fn puzzle1() {
     let input = parse_input();
 
+    let level_2_distances = generate_arrow_distances_level_2();
+
     let mut res = 0;
 
-    for (a, l) in input {
-        let l: Vec<char> = l.chars().collect();
-        println!("{}", l.iter().collect::<String>());
+    for code in input {
+        let mut chars = vec!['A'];
+        let mut to_append = code.1.chars().collect::<Vec<char>>();
+        chars.append(&mut to_append);
 
-        let l = num_vec_to_arrow_vec(l);
-        println!("{}", l.iter().collect::<String>());
+        let mut length = 0;
+        for i in 0..chars.len() - 1 {
+            length += calculate_numpad_distance(&chars[i], &chars[i + 1], &level_2_distances)
+        }
 
-        let l = arrow_vec_to_arrow_vec(l);
-        println!("{}", l.iter().collect::<String>());
-
-        let l = arrow_vec_to_arrow_vec(l);
-        println!("{}", l.iter().collect::<String>());
-
-        println!("{} {a}", l.len());
-
-        res += a * l.len();
+        res += (code.0 as i32) * length;
     }
 
     println!("day 21, puzzle 1: {res}");
-    
-    // let output: Vec<char> = "179A".to_string().chars().collect();
-    // println!("{}", output.iter().collect::<String>());
-
-    // let output = num_vec_to_arrow_vec(output);
-    // println!("{}", output.iter().collect::<String>());
-
-    // let output = arrow_vec_to_arrow_vec(output);
-    // println!("{}", output.iter().collect::<String>());
-
-    // let output = arrow_vec_to_arrow_vec(output);
-    // println!("{}", output.iter().collect::<String>());
-
 }
 
-fn num_vec_to_arrow_vec(from: Vec<char>) -> Vec<char> {
-    let mut output = num_to_arrows('A', from[0]);
-    for i in 0..from.len() - 1 {
-        output.append(&mut num_to_arrows(from[i], from[i + 1]))
+fn generate_arrow_distances_level_1() -> HashMap<(char, char), i32> {
+    let mut distances = HashMap::new();
+
+    let keys = vec!['<', 'v', '>', '^', 'A'];
+    for from in &keys {
+        for to in &keys {
+            let from_pos = arrow_to_pos(from);
+            let to_pos = arrow_to_pos(to);
+            distances.insert(
+                (*from, *to),
+                (from_pos.0 - to_pos.0).abs() + (from_pos.1 - to_pos.1).abs() + 1,
+            );
+        }
     }
 
-    output
+    distances
 }
 
-fn num_to_arrows(from: char, to: char) -> Vec<char> {
-    let from = num_to_pos(from);
-    let to = num_to_pos(to);
+fn generate_arrow_distances_level_2() -> HashMap<(char, char), i32> {
+    let mut distances = HashMap::new();
 
-    let diff_x = to.1 - from.1;
-    let sym_x;
-    if diff_x < 0 {
-        sym_x = '<';
-    } else {
-        sym_x = '>';
-    }
-    let mut syms_x = vec![sym_x; diff_x.abs() as usize];
+    let level_1_distances = generate_arrow_distances_level_1();
 
-    let diff_y = to.0 - from.0;
-    let sym_y;
-    if diff_y < 0 {
-        sym_y = 'v';
-    } else {
-        sym_y = '^';
-    }
-    let mut syms_y = vec![sym_y; diff_y.abs() as usize];
-
-    let mut out = vec![];
-    if from.0 == 0 && to.1 == 1 {
-        // if from.1 == 3 {
-        //     out.push('<');
-        //     syms_x.pop();
-        // }
-        out.push('^');
-        syms_y.pop();
-        out.append(&mut syms_x);
-        out.append(&mut syms_y);
-    // } else if diff_y < 0 {
-    //     out.append(&mut syms_y);
-    //     out.append(&mut syms_x);
-    } else {
-        out.append(&mut syms_x);
-        out.append(&mut syms_y);
+    let keys = vec!['<', 'v', '>', '^', 'A'];
+    for from in &keys {
+        for to in &keys {
+            let paths = generate_arrow_paths(from, to);
+            let mut min = std::i32::MAX;
+            for path in paths {
+                let candidate = path_length(path, &level_1_distances);
+                if candidate < min {
+                    min = candidate;
+                }
+            }
+            distances.insert((*from, *to), min);
+        }
     }
 
-    out.push('A');
-    out
+    distances
 }
 
-fn num_to_pos(c: char) -> (i32, i32) {
+fn generate_arrow_paths(from: &char, to: &char) -> Vec<Vec<char>> {
+    let mut paths = vec![];
+
+    match (*from, *to) {
+        ('<', 'A') => {
+            paths.push(vec!['>', '>', '^']);
+            paths.push(vec!['>', '^', '>']);
+        }
+        ('v', 'A') => {
+            paths.push(vec!['>', '^']);
+            paths.push(vec!['^', '>']);
+        }
+        ('A', '<') => {
+            paths.push(vec!['v', '<', '<']);
+            paths.push(vec!['<', 'v', '<']);
+        }
+        ('A', 'v') => {
+            paths.push(vec!['v', '<']);
+            paths.push(vec!['<', 'v']);
+        }
+        ('^', '>') => {
+            paths.push(vec!['v', '>']);
+            paths.push(vec!['>', 'v']);
+        }
+        ('>', '^') => {
+            paths.push(vec!['^', '<']);
+            paths.push(vec!['<', '^']);
+        }
+        ('^', '<') => {
+            paths.push(vec!['v', '<']);
+        }
+        ('<', '^') => {
+            paths.push(vec!['>', '^']);
+        }
+        _ => {
+            let mut path = vec![];
+            let from = arrow_to_pos(from);
+            let to = arrow_to_pos(to);
+
+            let diff_x = to.1 - from.1;
+            let sym_x;
+            if diff_x < 0 {
+                sym_x = '<';
+            } else {
+                sym_x = '>';
+            }
+            path.append(&mut vec![sym_x; diff_x.abs() as usize]);
+
+            let diff_y = to.0 - from.0;
+            let sym_y;
+            if diff_y < 0 {
+                sym_y = 'v';
+            } else {
+                sym_y = '^';
+            }
+            path.append(&mut vec![sym_y; diff_y.abs() as usize]);
+
+            paths.push(path);
+        }
+    }
+
+    for i in 0..paths.len() {
+        paths[i].push('A')
+    }
+
+    paths
+}
+
+fn path_length(mut path: Vec<char>, distances: &HashMap<(char, char), i32>) -> i32 {
+    let mut tmp_path = vec!['A'];
+    tmp_path.append(&mut path);
+    let path = tmp_path;
+
+    let mut length = 0;
+    for i in 0..path.len() - 1 {
+        length += distances.get(&(path[i], path[i + 1])).unwrap();
+    }
+
+    length
+}
+
+fn generate_num_paths(from: &char, to: &char) -> Vec<Vec<char>> {
+    let mut paths = vec![];
+
+    match (*from, *to) {
+        ('A', '1') => {
+            paths.push(vec!['<', '^', '<']);
+            paths.push(vec!['^', '<', '<']);
+        }
+        ('A', '2') => {
+            paths.push(vec!['<', '^']);
+            paths.push(vec!['^', '<']);
+        }
+        ('A', '4') => {
+            paths.push(vec!['^', '^', '<', '<']);
+            paths.push(vec!['^', '<', '^', '<']);
+            paths.push(vec!['^', '<', '<', '^']);
+            paths.push(vec!['<', '^', '^', '<']);
+            paths.push(vec!['<', '^', '<', '^']);
+        }
+        ('A', '5') => {
+            paths.push(vec!['^', '^', '<']);
+            paths.push(vec!['^', '<', '^']);
+            paths.push(vec!['<', '^', '^']);
+        }
+        ('1', 'A') => {
+            paths.push(vec!['>', '>', 'v']);
+            paths.push(vec!['>', 'v', '>']);
+        }
+        ('2', '9') => {
+            paths.push(vec!['^', '^', '>']);
+            paths.push(vec!['^', '>', '^']);
+            paths.push(vec!['^', '>', '^']);
+        }
+        ('3', '4') => {
+            paths.push(vec!['^', '<', '<']);
+            paths.push(vec!['<', '^', '<']);
+            paths.push(vec!['<', '<', '^']);
+        }
+        ('3', '7') => {
+            paths.push(vec!['^', '^', '<', '<']);
+            paths.push(vec!['^', '<', '^', '<']);
+            paths.push(vec!['^', '<', '<', '^']);
+            paths.push(vec!['<', '^', '^', '<']);
+            paths.push(vec!['<', '^', '<', '^']);
+            paths.push(vec!['<', '<', '^', '^']);
+        }
+        ('5', '9') => {
+            paths.push(vec!['>', '^']);
+            paths.push(vec!['^', '>']);
+        }
+        ('8', 'A') => {
+            paths.push(vec!['v', 'v', 'v', '>']);
+            paths.push(vec!['v', 'v', '>', 'v']);
+            paths.push(vec!['v', '>', 'v', 'v']);
+            paths.push(vec!['>', 'v', 'v', 'v']);
+        }
+        ('8', '6') => {
+            paths.push(vec!['v', '>']);
+            paths.push(vec!['>', 'v']);
+        }
+
+        _ => {
+            let mut path = vec![];
+            let from = num_to_pos(from);
+            let to = num_to_pos(to);
+
+            let diff_x = to.1 - from.1;
+            let sym_x;
+            if diff_x < 0 {
+                sym_x = '<';
+            } else {
+                sym_x = '>';
+            }
+            path.append(&mut vec![sym_x; diff_x.abs() as usize]);
+
+            let diff_y = to.0 - from.0;
+            let sym_y;
+            if diff_y < 0 {
+                sym_y = 'v';
+            } else {
+                sym_y = '^';
+            }
+            path.append(&mut vec![sym_y; diff_y.abs() as usize]);
+
+            paths.push(path);
+        }
+    }
+
+    for i in 0..paths.len() {
+        paths[i].push('A')
+    }
+
+    paths
+}
+
+fn calculate_numpad_distance(
+    from: &char,
+    to: &char,
+    level_2_distances: &HashMap<(char, char), i32>,
+) -> i32 {
+    let paths = generate_num_paths(from, to);
+    let mut min = std::i32::MAX;
+    for path in paths {
+        let candidate = path_length(path, &level_2_distances);
+        if candidate < min {
+            min = candidate;
+        }
+    }
+    min
+}
+
+fn num_to_pos(c: &char) -> (i32, i32) {
     match c {
         'A' => (0, 3),
         '0' => (0, 2),
@@ -112,64 +276,19 @@ fn num_to_pos(c: char) -> (i32, i32) {
     }
 }
 
-fn arrow_vec_to_arrow_vec(from: Vec<char>) -> Vec<char> {
-    let mut output = arrow_to_arrows('A', from[0]);
-    for i in 0..from.len() - 1 {
-        output.append(&mut arrow_to_arrows(from[i], from[i + 1]));
+fn arrow_to_pos(c: &char) -> (i32, i32) {
+    match c {
+        '<' => (0, 1),
+        'v' => (0, 2),
+        '>' => (0, 3),
+        '^' => (1, 2),
+        'A' => (1, 3),
+        _ => panic!("arrow_to_pos, got {c}"),
     }
-
-    output
-}
-
-fn arrow_to_arrows(from: char, to: char) -> Vec<char> {
-    let out_pre_str = match from {
-        'A' => match to {
-            'A' => "",
-            '^' => "<",
-            '>' => "v",
-            'v' => "v<",
-            '<' => "v<<",
-            _ => panic!(),
-        },
-        '^' => match to {
-            'A' => ">",
-            '^' => "",
-            '>' => "v>",
-            'v' => "v",
-            '<' => "v<",
-            _ => panic!(),
-        },
-        '>' => match to {
-            'A' => "^",
-            '^' => "<^",
-            '>' => "",
-            'v' => "<",
-            '<' => "<<",
-            _ => panic!(),
-        },
-        'v' => match to {
-            'A' => ">^",
-            '^' => "^",
-            '>' => ">",
-            'v' => "",
-            '<' => "<",
-            _ => panic!(),
-        },
-        '<' => match to {
-            'A' => ">>^",
-            '^' => ">^",
-            '>' => ">>",
-            'v' => ">",
-            '<' => "",
-            _ => panic!(),
-        },
-        _ => panic!(),
-    };
-    (out_pre_str.to_string() + "A").chars().collect()
 }
 
 pub fn parse_input() -> Vec<(usize, String)> {
-    let reader = read_input("input/day_21_mock.txt");
+    let reader = read_input("input/day_21.txt");
     reader
         .lines()
         .map(|l| {
